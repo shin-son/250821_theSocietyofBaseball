@@ -3,7 +3,8 @@
 #include <fstream>
 #include <string>
 
-namespace {
+class AttendanceFixture : public testing::Test {
+public:
     std::string& RunProgramOnceAndGetOutput() {
         static bool isDone = false;
         static std::string captured;
@@ -26,9 +27,9 @@ namespace {
         if (pos == std::string::npos) return {};
         return all.substr(pos);
     }
-}
+};
 
-TEST(Attendance, PrintsHeaderAndRemovedSectionMarker) {
+TEST_F(AttendanceFixture, PrintsHeaderAndRemovedSectionMarker) {
     const std::string& answer = RunProgramOnceAndGetOutput();
     EXPECT_NE(answer.find("NAME : "), std::string::npos);
     EXPECT_NE(answer.find("POINT : "), std::string::npos);
@@ -37,36 +38,36 @@ TEST(Attendance, PrintsHeaderAndRemovedSectionMarker) {
     EXPECT_NE(answer.find("=============="), std::string::npos);
 }
 
-TEST(Attendance, ContainsUmarSummaryLine) {
+TEST_F(AttendanceFixture, ContainsUmarSummaryLine) {
     const std::string& answer = RunProgramOnceAndGetOutput();
     EXPECT_NE(answer.find("NAME : Umar, POINT : 48, GRADE : SILVER"), std::string::npos);
 }
 
-TEST(Attendance, ContainsZaneSummaryLine) {
+TEST_F(AttendanceFixture, ContainsZaneSummaryLine) {
     const std::string& answer = RunProgramOnceAndGetOutput();
     EXPECT_NE(answer.find("NAME : Zane, POINT : 1, GRADE : NORMAL"), std::string::npos);
 }
 
-TEST(Attendance, HasAtLeastOneNormalMember) {
+TEST_F(AttendanceFixture, HasAtLeastOneNormalMember) {
     const std::string& answer = RunProgramOnceAndGetOutput();
     EXPECT_NE(answer.find("GRADE : NORMAL"), std::string::npos);
 }
 
-TEST(Attendance, ZaneAppearsInRemovedSection) {
+TEST_F(AttendanceFixture, ZaneAppearsInRemovedSection) {
     const std::string& answer = RunProgramOnceAndGetOutput();
     const std::string removedPlayer = GetRemovedSection(answer);
     ASSERT_FALSE(removedPlayer.empty()) << "Removed section not found";
     EXPECT_NE(removedPlayer.find("Zane"), std::string::npos);
 }
 
-TEST(Attendance, BobAppearsInRemovedSection) {
+TEST_F(AttendanceFixture, BobAppearsInRemovedSection) {
     const std::string& answer = RunProgramOnceAndGetOutput();
     const std::string removedPlayer = GetRemovedSection(answer);
     ASSERT_FALSE(removedPlayer.empty()) << "Removed section not found";
     EXPECT_NE(removedPlayer.find("Bob"), std::string::npos);
 }
 
-TEST(Attendance, XenaDoesNotAppearInRemovedSection) {
+TEST_F(AttendanceFixture, XenaDoesNotAppearInRemovedSection) {
     const std::string& answer = RunProgramOnceAndGetOutput();
     const std::string removedPlayer = GetRemovedSection(answer);
     ASSERT_FALSE(removedPlayer.empty()) << "Removed section not found";
