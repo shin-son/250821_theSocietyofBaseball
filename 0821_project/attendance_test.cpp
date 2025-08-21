@@ -8,6 +8,26 @@ protected:
     AttendanceSystem& svc = AttendanceSystem::instance();
 
 public:
+    void SetUp() override {
+        svc.updateAttendance("Xena");
+        for (int i = 0; i < 16; ++i)
+            svc.updateScore("Xena", "wednesday");
+
+        svc.updateAttendance("Bob");
+        for (int i = 0; i < 30; ++i)
+            svc.updateScore("Bob", "monday");
+
+        svc.updateAttendance("Steve");
+        for (int i = 0; i < 5; ++i)
+            svc.updateScore("Steve", "wednesday");
+        for (int i = 0; i < 25; ++i)
+            svc.updateScore("Steve", "monday");
+
+        svc.updateAttendance("Will");
+        for (int i = 0; i < 5; ++i)
+            svc.updateScore("Will", "monday");
+    }
+
     std::string runOnceAndCache(AttendanceSystem& svc) {
         std::string g_cached;
         testing::internal::CaptureStdout();
@@ -26,24 +46,6 @@ public:
 };
 
 TEST_F(AttendanceFixture, PrintsHeaderAndRemovedSectionMarker) {
-    svc.updateAttendance("Xena");
-    for (int i = 0; i < 16; ++i)
-        svc.updateScore("Xena", "wednesday");
-    
-    svc.updateAttendance("Bob");
-    for (int i = 0; i < 30; ++i)
-        svc.updateScore("Bob", "monday");
-    
-    svc.updateAttendance("Steve");
-    for (int i = 0; i < 5; ++i)
-        svc.updateScore("Steve", "wednesday");
-    for (int i = 0; i < 25; ++i)
-        svc.updateScore("Steve", "monday");
-
-    svc.updateAttendance("Will");
-    for (int i = 0; i < 5; ++i)
-        svc.updateScore("Will", "monday");
-
     const std::string answer = runOnceAndCache(svc);
 
     EXPECT_NE(answer.find("NAME : "), std::string::npos);
