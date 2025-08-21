@@ -2,54 +2,12 @@
 
 using namespace std;
 
-map<string, int> rollBook;
-int totalUniformNumber = 0;
-
-int bonusPoint[100][100];
-int totalPoint[100];
-int memberGrade[100];
-string memberNameArray[100];
-string gradeList[3] = { "NORMAL", "SILVER", "GOLD" };
-
-int trainingDayAttendanceCount[100];
-int weekendAttendanceCount[100];
-
-enum {
-	wednesday = 0,
-	weekend = 1,
-};
-
-void updateAttendance(string name) {
-	if (rollBook.count(name) == 0) {
-		rollBook.insert({ name, ++totalUniformNumber });
-		memberNameArray[totalUniformNumber] = name;
-	}
+AttendanceSystem& AttendanceSystem::instance() {
+	static AttendanceSystem inst;
+	return inst;
 }
 
-void updateScore(string name, string day) {
-	int uniformNumber = rollBook[name];
-
-	if (day == "wednesday") {
-		totalPoint[uniformNumber] += 3;
-		bonusPoint[uniformNumber][wednesday] += 1;
-		trainingDayAttendanceCount[uniformNumber]++;
-	}
-	else if (day == "saturday" || day == "sunday") {
-		totalPoint[uniformNumber] += 2;
-		bonusPoint[uniformNumber][weekend] += 1;
-		weekendAttendanceCount[uniformNumber]++;
-	}
-	else {
-		totalPoint[uniformNumber]++;
-	}
-}
-
-void updateAttendanceAndScore(string name, string day) {
-	updateAttendance(name);
-	updateScore(name, day);
-}
-
-void load() {
+void AttendanceSystem::load() {
 	ifstream fin{ "attendance_weekday_500.txt" }; //500개 데이터 입력
 	for (int rollBookIndex = 0; rollBookIndex < 500; rollBookIndex++) {
 		string name, day;
@@ -58,7 +16,7 @@ void load() {
 	}
 }
 
-void compute() {
+void AttendanceSystem::compute() {
 	for (int uniformNumber = 1; uniformNumber <= totalUniformNumber; uniformNumber++) {
 		if (bonusPoint[uniformNumber][wednesday] > 9) {
 			totalPoint[uniformNumber] += 10;
@@ -89,3 +47,35 @@ void compute() {
 		}
 	}
 }
+
+void AttendanceSystem::updateAttendanceAndScore(string name, string day) {
+	updateAttendance(name);
+	updateScore(name, day);
+}
+
+void AttendanceSystem::updateAttendance(string name) {
+	if (rollBook.count(name) == 0) {
+		rollBook.insert({ name, ++totalUniformNumber });
+		memberNameArray[totalUniformNumber] = name;
+	}
+}
+
+void AttendanceSystem::updateScore(string name, string day) {
+	int uniformNumber = rollBook[name];
+
+	if (day == "wednesday") {
+		totalPoint[uniformNumber] += 3;
+		bonusPoint[uniformNumber][wednesday] += 1;
+		trainingDayAttendanceCount[uniformNumber]++;
+	}
+	else if (day == "saturday" || day == "sunday") {
+		totalPoint[uniformNumber] += 2;
+		bonusPoint[uniformNumber][weekend] += 1;
+		weekendAttendanceCount[uniformNumber]++;
+	}
+	else {
+		totalPoint[uniformNumber]++;
+	}
+}
+
+AttendanceSystem::AttendanceSystem() = default;

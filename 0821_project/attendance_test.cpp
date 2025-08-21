@@ -4,12 +4,15 @@
 #include <string>
 
 class AttendanceFixture : public testing::Test {
+protected: 
+    AttendanceSystem& svc = AttendanceSystem::instance();
+
 public:
-    std::string runOnceAndCache() {
+    std::string runOnceAndCache(AttendanceSystem& svc) {
         std::string g_cached;
         testing::internal::CaptureStdout();
-        load();
-        compute();
+        svc.load();
+        svc.compute();
         g_cached = testing::internal::GetCapturedStdout();
         return g_cached;
     }
@@ -23,26 +26,25 @@ public:
 };
 
 TEST_F(AttendanceFixture, PrintsHeaderAndRemovedSectionMarker) {
-    updateAttendance("Xena");
+    svc.updateAttendance("Xena");
     for (int i = 0; i < 16; ++i)
-        updateScore("Xena", "wednesday");
+        svc.updateScore("Xena", "wednesday");
     
-    updateAttendance("Bob");
+    svc.updateAttendance("Bob");
     for (int i = 0; i < 30; ++i)
-        updateScore("Bob", "monday");
+        svc.updateScore("Bob", "monday");
     
-    updateAttendance("Steve");
+    svc.updateAttendance("Steve");
     for (int i = 0; i < 5; ++i)
-        updateScore("Steve", "wednesday");
+        svc.updateScore("Steve", "wednesday");
     for (int i = 0; i < 25; ++i)
-        updateScore("Steve", "monday");
+        svc.updateScore("Steve", "monday");
 
-    updateAttendance("Will");
+    svc.updateAttendance("Will");
     for (int i = 0; i < 5; ++i)
-        updateScore("Will", "monday");
+        svc.updateScore("Will", "monday");
 
-    compute();
-    const std::string answer = runOnceAndCache();
+    const std::string answer = runOnceAndCache(svc);
 
     EXPECT_NE(answer.find("NAME : "), std::string::npos);
     EXPECT_NE(answer.find("POINT : "), std::string::npos);
@@ -52,69 +54,69 @@ TEST_F(AttendanceFixture, PrintsHeaderAndRemovedSectionMarker) {
 }
 
 TEST_F(AttendanceFixture, ContainsSteveSummaryLine) {
-    const std::string answer = runOnceAndCache();
+    const std::string answer = runOnceAndCache(svc);
     EXPECT_NE(answer.find("NAME : Steve"), std::string::npos);
 }
 
 TEST_F(AttendanceFixture, HasAtLeastOneNormalMember) {
-    const std::string answer = runOnceAndCache();
+    const std::string answer = runOnceAndCache(svc);
     EXPECT_NE(answer.find("GRADE : NORMAL"), std::string::npos);
 }
 
 TEST_F(AttendanceFixture, WillAppearsInRemovedSection) {
-    const std::string answer = runOnceAndCache();
+    const std::string answer = runOnceAndCache(svc);
     EXPECT_NE(answer.find("Will"), std::string::npos);
 }
 
 TEST_F(AttendanceFixture, XenaDoesNotAppearInRemovedSection) {
-    const std::string answer = runOnceAndCache();
+    const std::string answer = runOnceAndCache(svc);
     const std::string removedPlayer = GetRemovedSection(answer);
     ASSERT_FALSE(removedPlayer.empty()) << "Removed section not found";
     EXPECT_EQ(removedPlayer.find("Xena"), std::string::npos);
 }
 
 TEST_F(AttendanceFixture, XenaAttendWednesdayOnce) {
-    updateAttendance("Xena");
-    updateScore("Xena", "wednesday");
-    EXPECT_NE(runOnceAndCache().find("Xena"), std::string::npos);
+    svc.updateAttendance("Xena");
+    svc.updateScore("Xena", "wednesday");
+    EXPECT_NE(runOnceAndCache(svc).find("Xena"), std::string::npos);
 }
 
 TEST_F(AttendanceFixture, XenaAttendHolidayOnce) {
-    updateAttendance("Xena");
-    updateScore("Xena", "sunday");
-    EXPECT_NE(runOnceAndCache().find("Xena"), std::string::npos);
+    svc.updateAttendance("Xena");
+    svc.updateScore("Xena", "sunday");
+    EXPECT_NE(runOnceAndCache(svc).find("Xena"), std::string::npos);
 }
 
 TEST_F(AttendanceFixture, XenaAttendWednesdayTen) {
-    updateAttendance("Xena");
+    svc.updateAttendance("Xena");
     for (int day = 0; day < 15; ++day)
-        updateScore("Xena", "wednesday");
+        svc.updateScore("Xena", "wednesday");
 
-    EXPECT_NE(runOnceAndCache().find("Xena"), std::string::npos);
+    EXPECT_NE(runOnceAndCache(svc).find("Xena"), std::string::npos);
 }
 
 TEST_F(AttendanceFixture, XenaAttendHolidayTen) {
-    updateAttendance("Xena");
+    svc.updateAttendance("Xena");
     for (int day = 0; day < 15; ++day)
-        updateScore("Xena", "sunday");
-    EXPECT_NE(runOnceAndCache().find("Xena"), std::string::npos);
+        svc.updateScore("Xena", "sunday");
+    EXPECT_NE(runOnceAndCache(svc).find("Xena"), std::string::npos);
 }
 
 TEST_F(AttendanceFixture, BobAttendMondayOnce) {
     static std::string captured;
 
-    updateAttendance("Bob");
-    updateScore("Bob", "monday");
-    captured = runOnceAndCache();
+    svc.updateAttendance("Bob");
+    svc.updateScore("Bob", "monday");
+    captured = runOnceAndCache(svc);
     EXPECT_NE(captured.find("Bob"), std::string::npos);
 }
 
 TEST_F(AttendanceFixture, BobGetsSilverGrade) {
     static std::string captured;
 
-    updateAttendance("Bob");
-    updateScore("Bob", "monday");
-    captured = runOnceAndCache();
+    svc.updateAttendance("Bob");
+    svc.updateScore("Bob", "monday");
+    captured = runOnceAndCache(svc);
 
     EXPECT_NE(captured.find("Bob"), std::string::npos);
 }

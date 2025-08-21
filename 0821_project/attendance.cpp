@@ -11,12 +11,9 @@ int main(int argc, char** argv) {
 }
 
 #else 
-void loadAndCompute() {
-	load();
-	compute();
-}
-
 int main() {
-	loadAndCompute();
+	auto& svc = AttendanceSystem::instance();
+	svc.load();
+	svc.compute();
 }
 #endif
