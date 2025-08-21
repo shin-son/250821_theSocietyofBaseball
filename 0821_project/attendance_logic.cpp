@@ -8,7 +8,7 @@ AttendanceSystem& AttendanceSystem::instance() {
 }
 
 void AttendanceSystem::load() {
-	ifstream fin{ "attendance_weekday_500.txt" }; //500개 데이터 입력
+	ifstream fin{ "attendance_weekday_500.txt" };
 	for (int rollBookIndex = 0; rollBookIndex < 500; rollBookIndex++) {
 		string name, day;
 		fin >> name >> day;
