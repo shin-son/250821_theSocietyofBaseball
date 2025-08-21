@@ -27,6 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="attendance_weekday_500.txt" />
+    <Text Include="attendance_answer.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

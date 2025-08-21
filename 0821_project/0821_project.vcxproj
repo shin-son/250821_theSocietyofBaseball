@@ -129,6 +129,7 @@
     <ClCompile Include="attendance_test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="attendance_answer.txt" />
     <Text Include="attendance_weekday_500.txt" />
   </ItemGroup>
   <ItemGroup>
